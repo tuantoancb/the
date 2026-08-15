@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kho thẻ lựa chọn - NTT</title>
+  <style>
+    :root{--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e5e7eb;--primary:#2563eb;--primary2:#1d4ed8;--ok:#16a34a;--danger:#dc2626}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,#eef5ff,#f8fbff 52%,#f6f7fb);color:var(--text)}
+    .wrap{max-width:1240px;margin:auto;padding:28px 18px 70px}.hero{background:linear-gradient(135deg,#1d4ed8,#3b82f6 58%,#60a5fa);color:white;border-radius:24px;padding:26px 28px;box-shadow:0 18px 45px #1d4ed829}.hero h1{margin:0 0 8px;font-size:clamp(25px,4vw,38px)}.hero p{margin:0;opacity:.92}
+    .toolbar{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin:20px 0}.search,.btn,.select{min-height:46px;border:1px solid var(--line);border-radius:13px;background:white;padding:0 14px;font-size:15px}.search{width:100%;outline:none}.search:focus{border-color:#93c5fd;box-shadow:0 0 0 4px #dbeafe}.btn{cursor:pointer;font-weight:700;color:#334155}.btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px #11182712}.btn.primary{background:var(--primary);border-color:var(--primary);color:white}.btn.primary:hover{background:var(--primary2)}.btn.danger{color:var(--danger)}
+    .status{display:flex;align-items:center;gap:10px;margin-bottom:15px;color:var(--muted);font-size:14px}.dot{width:9px;height:9px;border-radius:99px;background:#f59e0b}.dot.ok{background:var(--ok)}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px}.panel{background:#ffffffcc;backdrop-filter:blur(8px);border:1px solid #e7ebf2;border-radius:20px;box-shadow:0 12px 36px #0f172a0d}.cards-panel{padding:18px}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px}.card{position:relative;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:16px;padding:17px;cursor:pointer;min-height:124px;transition:.18s ease;box-shadow:0 4px 12px #0f172a08}.card:hover{border-color:#93c5fd;transform:translateY(-2px);box-shadow:0 10px 24px #2563eb16}.card.selected{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 3px #dbeafe}.check{position:absolute;right:12px;top:12px;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;border:1.5px solid #cbd5e1;background:white;color:transparent;font-weight:900}.selected .check{background:#2563eb;color:white;border-color:#2563eb}.card-title{font-weight:800;font-size:17px;padding-right:30px;line-height:1.3}.fields{margin-top:10px;display:grid;gap:5px}.field{font-size:13px;line-height:1.35;color:#475569}.field b{color:#334155}.side{padding:18px;position:sticky;top:16px;align-self:start}.side h2{margin:0 0 6px;font-size:20px}.counter{font-size:13px;color:var(--muted);margin-bottom:13px}.selected-list{display:grid;gap:8px;max-height:56vh;overflow:auto;padding-right:3px}.picked{display:flex;gap:10px;align-items:flex-start;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px 11px}.picked-name{font-weight:700;font-size:14px;flex:1}.remove{border:0;background:transparent;color:#94a3b8;font-size:18px;cursor:pointer}.side-actions{display:grid;gap:9px;margin-top:14px}.empty{padding:36px 14px;text-align:center;color:#94a3b8}.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:14px;padding:14px}.footer{margin-top:18px;text-align:center;color:#94a3b8;font-size:12px}
+    @media(max-width:850px){.layout{grid-template-columns:1fr}.side{position:static}.toolbar{grid-template-columns:1fr 1fr}.search{grid-column:1/-1}.cards{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero"><h1>🗂️ Kho thẻ lựa chọn</h1><p>Chọn nhanh các thẻ từ Google Sheet • NTT</p></section>
+    <div class="toolbar">
+      <input id="q" class="search" placeholder="🔎 Tìm kiếm thẻ..." />
+      <button id="selectAll" class="btn">Chọn tất cả</button>
+      <button id="clear" class="btn danger">Bỏ chọn</button>
+    </div>
+    <div class="status"><span id="dot" class="dot"></span><span id="status">Đang tải dữ liệu từ Google Sheet...</span></div>
+    <section class="layout">
+      <div class="panel cards-panel"><div id="cards" class="cards"></div></div>
+      <aside class="panel side">
+        <h2>✅ Đã chọn</h2><div id="counter" class="counter">0 thẻ</div>
+        <div id="selected" class="selected-list"><div class="empty">Chưa chọn thẻ nào</div></div>
+        <div class="side-actions">
+          <button id="copy" class="btn primary">📋 Sao chép danh sách</button>
+          <button id="download" class="btn">⬇️ Tải CSV đã chọn</button>
+        </div>
+      </aside>
+    </section>
+    <div class="footer">Nguồn dữ liệu: Google Sheet • Sheet ID 1PCjX-ttyfQqCmOeHju9rJciEXNIFK-skezM0cZzrzO0</div>
+  </main>
+<script>
+const state={rows:[],headers:[],selected:new Set(),query:''};
+const el=id=>document.getElementById(id);
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function titleFor(r,i){const vals=state.headers.map(h=>String(r[h]??'').trim()).filter(Boolean);return vals[0]||`Thẻ ${i+1}`}
+function render(){
+ const q=state.query.trim().toLowerCase();
+ const filtered=state.rows.map((r,i)=>({r,i})).filter(({r})=>!q||Object.values(r).join(' ').toLowerCase().includes(q));
+ el('cards').innerHTML=filtered.length?filtered.map(({r,i})=>{
+   const title=titleFor(r,i); const rest=state.headers.filter(h=>String(r[h]??'').trim() && String(r[h]).trim()!==title).slice(0,4);
+   return `<button class="card ${state.selected.has(i)?'selected':''}" data-i="${i}"><span class="check">✓</span><div class="card-title">${esc(title)}</div><div class="fields">${rest.map(h=>`<div class="field"><b>${esc(h)}:</b> ${esc(r[h])}</div>`).join('')}</div></button>`
+ }).join(''):`<div class="empty">Không tìm thấy thẻ phù hợp</div>`;
+ document.querySelectorAll('.card').forEach(c=>c.onclick=()=>toggle(+c.dataset.i));
+ const ids=[...state.selected]; el('counter').textContent=`${ids.length} thẻ`;
+ el('selected').innerHTML=ids.length?ids.map(i=>`<div class="picked"><div class="picked-name">${esc(titleFor(state.rows[i],i))}</div><button class="remove" data-r="${i}" title="Bỏ thẻ">×</button></div>`).join(''):`<div class="empty">Chưa chọn thẻ nào</div>`;
+ document.querySelectorAll('.remove').forEach(b=>b.onclick=e=>{e.stopPropagation();toggle(+b.dataset.r)});
+}
+function toggle(i){state.selected.has(i)?state.selected.delete(i):state.selected.add(i);render()}
+function csvCell(v){v=String(v??'');return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+async function load(){
+ try{const res=await fetch('/api/sheet'); const data=await res.json(); if(!res.ok)throw new Error(data.error||'Không tải được dữ liệu'); state.headers=data.headers;state.rows=data.rows;el('status').textContent=`Đã tải ${data.rows.length} thẻ từ Google Sheet`;el('dot').classList.add('ok');render()}
+ catch(e){el('status').textContent='Không thể tải Google Sheet';el('cards').innerHTML=`<div class="error"><b>Lỗi:</b> ${esc(e.message)}<br><br>Hãy bảo đảm Google Sheet được chia sẻ ở chế độ “Bất kỳ ai có đường liên kết đều có thể xem”.</div>`}
+}
+el('q').oninput=e=>{state.query=e.target.value;render()};
+el('clear').onclick=()=>{state.selected.clear();render()};
+el('selectAll').onclick=()=>{state.rows.forEach((_,i)=>state.selected.add(i));render()};
+el('copy').onclick=async()=>{const txt=[...state.selected].map(i=>titleFor(state.rows[i],i)).join('\n');if(!txt)return alert('Bạn chưa chọn thẻ nào.');await navigator.clipboard.writeText(txt);const b=el('copy');const old=b.textContent;b.textContent='✅ Đã sao chép';setTimeout(()=>b.textContent=old,1200)};
+el('download').onclick=()=>{const ids=[...state.selected];if(!ids.length)return alert('Bạn chưa chọn thẻ nào.');const lines=[state.headers.map(csvCell).join(','),...ids.map(i=>state.headers.map(h=>csvCell(state.rows[i][h])).join(','))];const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='the-da-chon.csv';a.click();URL.revokeObjectURL(a.href)};
+load();
+</script>
+</body></html>
